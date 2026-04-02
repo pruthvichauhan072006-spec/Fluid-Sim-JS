@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style> 
+body {
+    background-color: rgb(72, 72, 72);
+    font-family: sans-serif;
+}
+
+#Container {
+    position: relative; /* Needed to absolutely position the UI inside it */
+    margin: auto;
+    margin-top: 50px;
+    height: 700px;
+    width: 1200px;
+    background-color: rgb(0, 0, 0);
+    border-radius: 5px;
+    box-shadow: 0 0 15px 5px rgb(118, 248, 255);
+    overflow: hidden;
+}
+
+/* --- New UI Panel CSS --- */
+#ui-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(20, 20, 20, 0.8);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 1px solid rgb(118, 248, 255);
+    backdrop-filter: blur(5px);
+    pointer-events: auto; /* Ensure we can click the UI */
+    z-index: 10;
+}
+
+#ui-panel h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: rgb(118, 248, 255);
+}
+
+.control-group {
+    margin-bottom: 15px;
+}
+
+.control-group label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+select, button {
+    width: 100%;
+    padding: 8px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+select:hover, button:hover {
+    background: #444;
+}
+
+button:active {
+    background: rgb(118, 248, 255);
+    color: black;
+}
+</style>
+<script src="myscript1.js" defer></script>
+</head>
+<body>
+
+<div id="Container">
+    <div id="ui-panel">
+        <h3>Fluid Controls</h3>
+        
+        <div class="control-group">
+            <label>Brush Mode (Keys: 1, 2)</label>
+            <select id="brushMode">
+                <option value="1">Add Liquid (1)</option>
+                <option value="2" selected>Move/Push (2)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Render View (Keys: 3, 4)</label>
+            <select id="renderMode">
+                <option value="1">Density/Water View (3)</option>
+                <option value="2" selected>Speed/Color View (4)</option>
+            </select>
+        </div>
+
+        <button id="clearBtn">Clear Particles (C)</button>
+    </div>
+
+    <canvas id="FluidCanvas"></canvas>
+</div>
+
+</body>
+</html>

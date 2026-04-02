@@ -237,7 +237,7 @@ class FluidSim {
     mouseEvents(md,mx,my,vx,vy,s){
         if(md && s==1){
             for(let i=0;i<10;i++){
-                this.spwnP(mx + (Math.random()-0.5)*150, my + (Math.random()-0.5)*150);
+                this.spwnP(mx + (Math.random()-0.5)*100, my + (Math.random()-0.5)*100);
             }}
         if(md && s==2){
             const rad2 = 9000;
@@ -279,11 +279,21 @@ engine.initGrid(w,h);
 // Path2.arc(100,100,engine.r,0,Math.PI * 2);
 // ctx.fillStyle = "rgb(83, 200, 243)";
 // ctx.fill(Path2);
-
 let isMd = false;
 let mx = 0; my = 0
 let pmx = 0; pmy = 0;
 let mvx = 0; mvy = 0;
+
+// --- State Variables for our UI ---
+let currentBrushMode = 2; // Default to 'Move'
+let currentRenderMode = 2; // Default to 'Speed/Color'
+
+// --- Get UI Elements ---
+const brushSelect = document.getElementById('brushMode');
+const renderSelect = document.getElementById('renderMode');
+const clearBtn = document.getElementById('clearBtn');
+
+// --- Mouse Listeners ---
 window.addEventListener('mousedown', () => isMd = true);
 window.addEventListener('mouseup', () => isMd = false);
 window.addEventListener('mousemove', (e) =>{
@@ -296,66 +306,72 @@ window.addEventListener('mousemove', (e) =>{
     mvy = my - pmy;
 });
 
-let CurrentRenderer = 2;
-let CurrentBrush = 2;
+// --- UI Event Listeners ---
+brushSelect.addEventListener('change', (e) => {
+    currentBrushMode = parseInt(e.target.value);
+});
 
-window.addEventListener('keypress', (e) => {
-    switch(e.key.toLowerCase()){
+renderSelect.addEventListener('change', (e) => {
+    currentRenderMode = parseInt(e.target.value);
+});
+
+clearBtn.addEventListener('click', () => {
+    engine.actcap = 0; // Quick way to wipe all particles
+});
+
+// --- Keyboard Event Listeners ---
+window.addEventListener('keydown', (e) => {
+    switch(e.key.toLowerCase()) {
         case '1':
-            CurrentBrush = 1;
-            break
+            currentBrushMode = 1;
+            brushSelect.value = "1"; // Update the dropdown visual
+            break;
         case '2':
-            CurrentBrush = 2;
+            currentBrushMode = 2;
+            brushSelect.value = "2";
             break;
         case '3':
-            CurrentRenderer = 1
+            currentRenderMode = 1;
+            renderSelect.value = "1";
             break;
         case '4':
-            CurrentRenderer = 2
+            currentRenderMode = 2;
+            renderSelect.value = "2";
             break;
         case 'c':
-            engine.actcap = 0;
+            engine.actcap = 0; // Clear screen
             break;
     }
-})
+});
 
+
+// Initial spawn
 for (let i=0;i<500;i++){
    engine.spwnP(w/2+(Math.random()-0.5)*300,h/2+(Math.random()-0.5)*300);
 }
 
 let lt = performance.now();
-//let lt =0;
+
 function updateloop(currenttime){
     let dt = (currenttime-lt)/10000;
-    //let dt = 0.016;
-    //lt = currenttime;
-
     if (dt > 0.016){dt = 0.016;}
 
-    //for (let i = 0; i < 500; i++) {
-    //    if (engine.actcap < engine.cap) {
-    //        // Drop them from the top middle of the screen
-    //        engine.spwnP(w/2 + (Math.random() - 0.5) * 1000, h*0.7 + Math.random() * 300);
-    //    }
-    //} TAP
+    // Use our dynamic currentBrushMode here!
+    engine.mouseEvents(isMd, mx, my, mvx, mvy, currentBrushMode);
 
-    // if(isMd){
-    //     for(let i=0;i<10;i++){
-    //         engine.spwnP(mx + (Math.random()-0.5)*100, my + (Math.random()-0.5)*100);
-    //     }
-    // }
-
-    engine.mouseEvents(isMd,mx,my,mvx,mvy,CurrentBrush);
-
-    //ctx.clearRect(0,0,w,h);
     let ss = 5;
     for (let s=0; s<ss;s++){
-    engine.updateGrid();
-    engine.calculateDensity();
-    engine.applyPressure();
-    engine.update(dt,w,h);}
+        engine.updateGrid();
+        engine.calculateDensity();
+        engine.applyPressure();
+        engine.update(dt,w,h);
+    }
+    
     ctx.clearRect(0,0,w,h);
-    engine.render(ctx,CurrentRenderer)
+    
+    // Use our dynamic currentRenderMode here!
+    engine.render(ctx, currentRenderMode);
+    
     requestAnimationFrame(updateloop);
 }
 requestAnimationFrame(updateloop);
